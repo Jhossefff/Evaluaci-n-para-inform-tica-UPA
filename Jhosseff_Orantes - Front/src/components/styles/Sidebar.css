@@ -10,7 +10,7 @@
     height: 100vh;
   }
   
-  /* Header section */
+  /* Header  */
   .sidebar-header {
     padding: 10px 20px;
   }
@@ -73,7 +73,7 @@
     margin-right: 10px;
   }
   
-  /* User section */
+  /*  Seccion de Usuario */
   .sidebar-user {
     display: flex;
     align-items: center;

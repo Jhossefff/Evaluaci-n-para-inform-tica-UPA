@@ -7,9 +7,9 @@ const Dashboard = () => {
   return (
     <main className="dashboard">
       <section className="dashboard-cards">
-        <Card title="Ingresos " value="$17,643.41" />
-        <Card title="Gastos" value="$2,348.00" />
-        <Card title="Prestamos" value="$2,348.00" />
+        <Card title="Ingresos " value="Diciembre" />
+        <Card title="Gastos" value="2024" />
+        <Card title="Prestamos" value="Ocubre" />
       </section>
       <section className="dashboard-tables">
 
