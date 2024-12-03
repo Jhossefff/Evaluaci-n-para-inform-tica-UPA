@@ -6,11 +6,11 @@ const Header = () => {
     <header className="header">
       <div className="header-title">
         <h1>Declaraciones</h1>
-        <button className="add-filter">+ Agregar Filtro</button>
+        <button className="add-filter">+ Agregar</button>
       </div>
       <div className="header-profile">
         <img
-          src="https://via.placeholder.com/40"
+          src="/src/assets/Usuario.png"
           alt="User"
           className="profile-avatar"
         />

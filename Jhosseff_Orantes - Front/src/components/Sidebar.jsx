@@ -46,7 +46,7 @@ const Sidebar = () => {
       </ul>
       <div className="sidebar-user">
         <img
-          src="https://via.placeholder.com/40"
+          src="/src/assets/Usuario.png"
           alt="User"
           className="user-avatar"
         />
