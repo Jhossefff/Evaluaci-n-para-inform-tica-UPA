@@ -1,63 +1,70 @@
-import React, { useState } from 'react';
-import './styles/Formulario.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Hook para la navegación
+import "./styles/Formulario.css";
 
 const Formulario = () => {
-  const [nombre, setNombre] = useState('');
-  const [fechaNacimiento, setFechaNacimiento] = useState('');
-  const [edad, setEdad] = useState(0);
-  const [telefono, setTelefono] = useState('');
-  const [correo, setCorreo] = useState('');
+  const [nombre, setNombre] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [estadoUsuarioId, setEstadoUsuarioId] = useState(1);
+  const [mensaje, setMensaje] = useState("");
   const [errores, setErrores] = useState({});
 
-  const calcularEdad = (fecha) => {
-    const hoy = new Date();
-    const nacimiento = new Date(fecha);
-    let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
-    const diferenciaMeses = hoy.getMonth() - nacimiento.getMonth();
-    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nacimiento.getDate())) {
-      edadCalculada--;
-    }
-    setEdad(edadCalculada > 0 ? edadCalculada : 0);
-  };
+  const navigate = useNavigate(); // Hook para redireccionar
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validaciones
     const nuevosErrores = {};
     const nombreRegex = /^[a-zA-Z\s]+$/;
     const telefonoRegex = /^[0-9]+$/;
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!nombreRegex.test(nombre)) {
-      nuevosErrores.nombre = 'El nombre solo puede contener letras.';
+      nuevosErrores.nombre = "El nombre solo puede contener letras.";
     }
     if (!telefonoRegex.test(telefono)) {
-      nuevosErrores.telefono = 'El teléfono solo puede contener números.';
+      nuevosErrores.telefono = "El teléfono solo puede contener números.";
     }
     if (!correoRegex.test(correo)) {
-      nuevosErrores.correo = 'El correo no es válido.';
+      nuevosErrores.correo = "El correo no es válido.";
     }
     if (!fechaNacimiento) {
-      nuevosErrores.fechaNacimiento = 'La fecha de nacimiento es obligatoria.';
+      nuevosErrores.fechaNacimiento = "La fecha de nacimiento es obligatoria.";
     }
 
     setErrores(nuevosErrores);
 
     if (Object.keys(nuevosErrores).length === 0) {
-      // Enviar datos al servidor
       try {
-        const response = await fetch('http://localhost:5000/api/formulario', {
-          method: 'POST',
+        const response = await fetch("http://localhost:3000/api/usuarios", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ nombre, fechaNacimiento, telefono, correo }),
+          body: JSON.stringify({
+            nombre,
+            fecha: fechaNacimiento,
+            telefono,
+            correo,
+            EstadoUsuarioId: estadoUsuarioId,
+          }),
         });
+
         const data = await response.json();
-        alert(data.message || 'Formulario enviado correctamente');
+
+        if (response.ok) {
+          setMensaje("Usuario creado exitosamente.");
+          setNombre("");
+          setFechaNacimiento("");
+          setTelefono("");
+          setCorreo("");
+        } else {
+          setMensaje(data.error || "Error al crear el usuario.");
+        }
       } catch (error) {
-        alert('Hubo un error al enviar el formulario.');
+        setMensaje("Error al conectarse con el servidor.");
       }
     }
   };
@@ -65,6 +72,8 @@ const Formulario = () => {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Formulario de Registro</h2>
+
+      {mensaje && <p className="success-message">{mensaje}</p>}
 
       <div className="form-group">
         <label htmlFor="nombre">Nombre:</label>
@@ -74,7 +83,7 @@ const Formulario = () => {
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           placeholder="Ingresa tu nombre"
-          className={errores.nombre ? 'input-error' : ''}
+          className={errores.nombre ? "input-error" : ""}
         />
         {errores.nombre && <span className="error">{errores.nombre}</span>}
       </div>
@@ -85,24 +94,12 @@ const Formulario = () => {
           id="fechaNacimiento"
           type="date"
           value={fechaNacimiento}
-          onChange={(e) => {
-            setFechaNacimiento(e.target.value);
-            calcularEdad(e.target.value);
-          }}
-          className={errores.fechaNacimiento ? 'input-error' : ''}
+          onChange={(e) => setFechaNacimiento(e.target.value)}
+          className={errores.fechaNacimiento ? "input-error" : ""}
         />
-        {errores.fechaNacimiento && <span className="error">{errores.fechaNacimiento}</span>}
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="edad">Edad:</label>
-        <input
-          id="edad"
-          type="text"
-          value={`${edad} años`}
-          readOnly
-          className="input-readonly"
-        />
+        {errores.fechaNacimiento && (
+          <span className="error">{errores.fechaNacimiento}</span>
+        )}
       </div>
 
       <div className="form-group">
@@ -113,7 +110,7 @@ const Formulario = () => {
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
           placeholder="Ingresa tu teléfono"
-          className={errores.telefono ? 'input-error' : ''}
+          className={errores.telefono ? "input-error" : ""}
         />
         {errores.telefono && <span className="error">{errores.telefono}</span>}
       </div>
@@ -126,14 +123,35 @@ const Formulario = () => {
           value={correo}
           onChange={(e) => setCorreo(e.target.value)}
           placeholder="Ingresa tu correo"
-          className={errores.correo ? 'input-error' : ''}
+          className={errores.correo ? "input-error" : ""}
         />
         {errores.correo && <span className="error">{errores.correo}</span>}
       </div>
 
-      <button type="submit" className="form-button">
-        Enviar
-      </button>
+      <div className="form-group">
+        <label htmlFor="estadoUsuarioId">Estado:</label>
+        <select
+          id="estadoUsuarioId"
+          value={estadoUsuarioId}
+          onChange={(e) => setEstadoUsuarioId(e.target.value)}
+        >
+          <option value={1}>Activo</option>
+          <option value={2}>Inactivo</option>
+        </select>
+      </div>
+
+      <div className="form-buttons">
+        <button type="submit" className="form-button">
+          Enviar
+        </button>
+        <button
+          type="button"
+          className="form-button back-button"
+          onClick={() => navigate("/")} // Navega a la ruta principal
+        >
+          Regresar
+        </button>
+      </div>
     </form>
   );
 };
